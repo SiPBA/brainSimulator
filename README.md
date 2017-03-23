@@ -10,4 +10,4 @@ images, classes = sim.generateDataset(original_dataset, labels, N=200, classes=[
 ```
 
 ## License
-This code is under the license [GPL-3.0+](https://choosealicense.com/licenses/gpl-3.0/). 
+This code is released under the license [GPL-3.0+](https://choosealicense.com/licenses/gpl-3.0/). 
