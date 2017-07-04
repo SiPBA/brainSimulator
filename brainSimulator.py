@@ -28,26 +28,30 @@ import numpy as np
 #Decomposition
 #Good reconstruction is np.dot(Spca, pca.components_)+pca.mean_
 from sklearn.decomposition import PCA, FastICA
-def applyPCA(X, regularize=True):
+def applyPCA(X, regularize=True, n_comp=-1):
     if(regularize):
         mean_ = np.mean(X, axis=0)
         X = X - mean_
         var_ = np.var(X,axis=0)
         X  = X/var_
-    pca = PCA(n_components=X.shape[0]-1)
+    if n_comp==-1:
+        n_comp = X.shape[0]-1
+    pca = PCA(n_components=n_comp)
     Spca = pca.fit_transform(X)
     if not regularize:
         mean_ = pca.mean_
         var_ = None
     return Spca, pca.components_, mean_, var_
     
-def applyICA(X, regularize=True):
+def applyICA(X, regularize=True, n_comp=-1):
     if(regularize):
         mean_ = np.mean(X, axis=0)
         X = X - mean_
         var_ = np.var(X,axis=0)
         X  = X/var_
-    ica = FastICA(n_components=21)
+    if n_comp==-1:
+        n_comp = X.shape[0]-1
+    ica = FastICA(n_components=n_comp)
     Sica = ica.fit_transform(X)
     if not regularize:
         mean_ = ica.mean_
@@ -56,11 +60,11 @@ def applyICA(X, regularize=True):
 
 #Density estimation 
 from sklearn.neighbors.kde import KernelDensity
-from sklearn.grid_search import GridSearchCV
+from sklearn.model_selection import GridSearchCV
 import os
-os.chdir('pyStable')
-from stable import StableDist
-os.chdir('..')
+#os.chdir('pyStable')
+#from stable import StableDist
+#os.chdir('..')
 
 class GaussianEstimator:
     """
@@ -244,7 +248,7 @@ def createNewBrains(kernel, N, coef, mean, var=None):
     return simStack
     
 
-def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, classes=None, COEFF=None, MEAN=None, method='kde',regularize=False, verbose=False):
+def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, classes=None, COEFF=None, MEAN=None, method='kde',regularize=False, verbose=False, n_comp=-1):
     labels = labels.astype(int)
     if classes==None:
         classes = list(set(labels))
@@ -254,9 +258,9 @@ def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, classes
         if(verbose):
             print('Applying decomposition')
         if algorithm=='PCA':
-            SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize)
+            SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize, n_comp)
         elif algorithm=='ICA':
-            SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize)
+            SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize, n_comp)
         if(verbose):
             print('Creating Density Matrices')
         kernels, uniqLabels = createDensityMatrices(SCORE, labels[selection], method=method)    
