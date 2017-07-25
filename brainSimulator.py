@@ -94,22 +94,24 @@ class MVNormalEstimator:
     to a given multivariate normal parametrization, estimated from the data
     Works only with python 3.4+ (due to numpy matrix multiplication)
     """
+    
     def __init__(self, mean=0.0, cov=1.0):
+        from scipy.stats import multivariate_normal
         self.mu = mean
         self.cov = cov
+        self.model = multivariate_normal
         
     def sample(self, dimension = 1.0):
-        return np.random.multivariate_normal(self.mu,self.cov,dimension)
+        return np.random.multivariate_normal(mean=self.mu, cov=self.cov, size=dimension)
         
     def fit(self, x):
+        from sklearn.covariance import ledoit_wolf
         self.mu = x.mean(axis=0)
-        self.cov = np.cov(x.T) # Faster and easier
+        self.cov = ledoit_wolf(x)[0] # Faster and easier
 	# self.cov = ((x-x.mean(axis=0))/data.shape[0]).T.dot(x-x.mean(axis=0)) # opcion más compleja.. timeit? 
         
     def pdf(self, x):
-        part1 = 1 / ( ((2* np.pi)**(len(self.mu)/2)) * (np.linalg.det(self.cov)**(1/2)) )
-        part2 = (-1/2) * ((x-self.mu).T.dot(np.linalg.inv(self.cov))).dot((x-self.mu))
-        return float(part1 * np.exp(part2))
+        return self.model.pdf(x, mean=self.mu, cov=self.cov)
         
     def cdf(self, x):
         return np.exp(-np.power(x - self.mu, 2.) / (2 * self.var))
@@ -248,19 +250,20 @@ def createNewBrains(kernel, N, coef, mean, var=None):
     return simStack
     
 
-def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, classes=None, COEFF=None, MEAN=None, method='kde',regularize=False, verbose=False, n_comp=-1):
+def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, uniqLabels=None, classes=None, SCORE=None, COEFF=None, MEAN=None, VAR=None, method='kde',regularize=False, verbose=False, n_comp=-1):
     labels = labels.astype(int)
     if classes==None:
         classes = list(set(labels))
     selection = np.array([x in classes for x in labels])
     stack_fin = stack[selection,:]
-    if kernels==None:
+    if SCORE is None and COEFF is None and MEAN is None and kernels is not None: 
         if(verbose):
             print('Applying decomposition')
         if algorithm=='PCA':
             SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize, n_comp)
         elif algorithm=='ICA':
             SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize, n_comp)
+    if kernels==None:
         if(verbose):
             print('Creating Density Matrices')
         kernels, uniqLabels = createDensityMatrices(SCORE, labels[selection], method=method)    
