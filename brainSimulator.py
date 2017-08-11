@@ -343,7 +343,7 @@ class BrainSimulator:
         if(self.verbose):
             print('Creating brains with class %d'%clas)
         stackaux = self.createNewBrains(N,self.kernels[self.uniqLabels.index(clas)])
-        labelsaux = np.array([clas]*N)
+        labelsaux = np.array([int(clas)]*N)
         return labelsaux, stackaux
 
     
@@ -387,38 +387,4 @@ class BrainSimulator:
             finStack[finStack<0]=0.
         return labels, finStack
 
-#def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, uniqLabels=None, classes=None, SCORE=None, COEFF=None, MEAN=None, VAR=None, method='kde',regularize=False, verbose=False, n_comp=-1):
-#    """
-#    labels -> labels of the dataset
-#    classes -> classes to be generated
-#    """
-#    labels = labels.astype(int)
-#    if classes==None:
-#        classes = list(set(labels))
-#    selection = np.array([x in classes for x in labels])
-#    stack_fin = stack[selection,:]
-#    if SCORE is None and COEFF is None and MEAN is None and kernels is not None: 
-#        if(verbose):
-#            print('Applying decomposition')
-#        if algorithm=='PCA':
-#            SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize, n_comp)
-#        elif algorithm=='ICA':
-#            SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize, n_comp)
-#    if kernels==None:
-#        if(verbose):
-#            print('Creating Density Matrices')
-#        kernels, uniqLabels = createDensityMatrices(SCORE, labels[selection], method=method)    
-#    for clas in classes:
-#        if(verbose):
-#            print('Creating brains with class %d'%clas)
-#        stackaux = createNewBrains(N,kernels[uniqLabels.index(clas)])
-#        labelsaux = np.array([clas]*N)
-#        if 'finStack' not in locals():
-#            finStack = stackaux
-#            labels = labelsaux
-#        else:
-#            finStack = np.vstack((finStack, stackaux))
-#            labels = np.hstack((labels, labelsaux))
-#    finStack[finStack<0]=0.
-#    return labels, finStack
-#
+
