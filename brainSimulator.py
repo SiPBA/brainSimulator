@@ -4,6 +4,7 @@ Performs a simulation of functional neuroimaging based on parameters
 extracted from an existing dataset. 
 
 Created on Thu Apr 28 15:53:15 2016
+Last update: 9 Aug, 2017
 
 @author: pakitochus
 
@@ -34,8 +35,6 @@ def applyPCA(X, regularize=True, n_comp=-1):
         X = X - mean_
         var_ = np.var(X,axis=0)
         X  = X/var_
-    if n_comp==-1:
-        n_comp = X.shape[0]-1
     pca = PCA(n_components=n_comp)
     Spca = pca.fit_transform(X)
     if not regularize:
@@ -49,8 +48,6 @@ def applyICA(X, regularize=True, n_comp=-1):
         X = X - mean_
         var_ = np.var(X,axis=0)
         X  = X/var_
-    if n_comp==-1:
-        n_comp = X.shape[0]-1
     ica = FastICA(n_components=n_comp)
     Sica = ica.fit_transform(X)
     if not regularize:
@@ -58,10 +55,6 @@ def applyICA(X, regularize=True, n_comp=-1):
         var_ = None
     return Sica, ica.components_, mean_, var_
 
-#Density estimation 
-from sklearn.neighbors.kde import KernelDensity
-from sklearn.model_selection import GridSearchCV
-import os
 #os.chdir('pyStable')
 #from stable import StableDist
 #os.chdir('..')
@@ -69,7 +62,7 @@ import os
 class GaussianEstimator:
     """
     This class generates an interface for generating random numbers according
-    to a certain gaussian parametrization, estimated from the data
+    to a per-component gaussian parametrization, estimated from the data
     """
     def __init__(self, mean=0.0, var=1.0):
         self.mu = mean
@@ -116,168 +109,316 @@ class MVNormalEstimator:
     def cdf(self, x):
         return np.exp(-np.power(x - self.mu, 2.) / (2 * self.var))
     
-
-from scipy import fftpack, optimize
-# Find the largest float available for this numpy
-if hasattr(np, 'float128'):
-    large_float = np.float128
-elif hasattr(np, 'float96'):
-    large_float = np.float96
-else:
-    large_float = np.float64
-    
-def _botev_fixed_point(t, M, I, a2):
-    l = 7
-    I = large_float(I)
-    M = large_float(M)
-    a2 = large_float(a2)
-    f = 2 * np.pi ** (2 * l) * np.sum(I ** l * a2 *
-                                      np.exp(-I * np.pi ** 2 * t))
-    for s in range(l, 1, -1):
-        K0 = np.prod(np.arange(1, 2 * s, 2)) / np.sqrt(2 * np.pi)
-        const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
-        time = (2 * const * K0 / M / f) ** (2 / (3 + 2 * s))
-        f = 2 * np.pi ** (2 * s) * \
-            np.sum(I ** s * a2 * np.exp(-I * np.pi ** 2 * time))
-    return t - (2 * M * np.sqrt(np.pi) * f) ** (-2 / 5)
-
-
-def finite(val):
-    return val is not None and np.isfinite(val)
-
-def botev_bandwidth(data):
+#Density estimation 
+class KDEestimator:
     """
-    Implementation of the KDE bandwidth selection method outline in:
-
-    Z. I. Botev, J. F. Grotowski, and D. P. Kroese. Kernel density
-    estimation via diffusion. The Annals of Statistics, 38(5):2916-2957, 2010.
-
-    Based on the implementation of Daniel B. Smith, PhD.
-
-    The object is a callable returning the bandwidth for a 1D kernel.
-    
-    Forked from the package PyQT_fit. 
+    This class generates an interface for generating random numbers according
+    to a certain gaussian parametrization, estimated from the data
     """
-#    def __init__(self, N=None, **kword):
-#        if 'lower' in kword or 'upper' in kword:
-#            print("Warning, using 'lower' and 'upper' for botev bandwidth is "
-#                  "deprecated. Argument is ignored")
-#        self.N = N
-#
-#    def __call__(self, data):#, model):
-#        """
-#        Returns the optimal bandwidth based on the data
-#        """
-    N = 2 ** 10 #if self.N is None else int(2 ** np.ceil(np.log2(self.N)))
-#        lower = getattr(model, 'lower', None)
-#        upper = getattr(model, 'upper', None)
-#        if not finite(lower) or not finite(upper):
-    minimum = np.min(data)
-    maximum = np.max(data)
-    span = maximum - minimum
-    lower = minimum - span / 10 #if not finite(lower) else lower
-    upper = maximum + span / 10 #if not finite(upper) else upper
-    # Range of the data
-    span = upper - lower
-
-    # Histogram of the data to get a crude approximation of the density
-#        weights = model.weights
-#        if not weights.shape:
-    weights = None
-    M = len(data)
-    DataHist, bins = np.histogram(data, bins=N, range=(lower, upper), weights=weights)
-    DataHist = DataHist / M
-    DCTData = fftpack.dct(DataHist, norm=None)
-
-    I = np.arange(1, N, dtype=int) ** 2
-    SqDCTData = (DCTData[1:] / 2) ** 2
-    guess = 0.1
-
-    try:
-        t_star = optimize.brentq(_botev_fixed_point, 0, guess,
-                                 args=(M, I, SqDCTData))
-    except ValueError:
-        t_star = .28 * N ** (-.4)
-
-    return np.sqrt(t_star) * span
-
-
-def estimateDensity(X, method='kde'):
-    # Returns an estimator of the PDF of the current data. 
-    if method is 'kde':
-        kernel = KernelDensity(bandwidth=botev_bandwidth(X.flatten()))
-#        params = {'bandwidth': np.logspace(-1, 20, 100)}
-#        grid = GridSearchCV(KernelDensity(), params)
-#        grid.fit(X[:,np.newaxis])
-#        kernel = grid.best_estimator_
-    elif method is 'stable':
-        kernel = StableDist(1, 1, 0, 1)
-    elif method is 'gaussian':
-        kernel = GaussianEstimator()
-    kernel.fit(X[:,np.newaxis])
-    return kernel
-
-def createDensityMatrices(X,labels, method='kde'):
-    kernels = []    
-    uniqLabels = list(set(labels)) # Is an array containing only class labels 
-#    for lab in set(labels):
-#        uniqLabels.append(lab)
-    for idx,lab in enumerate(uniqLabels):
-        if method is 'mvnormal':
-            kernel = MVNormalEstimator()
-            kernel.fit(X[labels==lab,:]) 
-            kernels.append(kernel)
+    def __init__(self, bandwidth=1.0):
+        from sklearn.neighbors.kde import KernelDensity
+        self.bandwidth = bandwidth
+        self.model = KernelDensity(bandwidth=self.bandwidth)
+        
+    def _botev_fixed_point(self, t, M, I, a2):
+        # Find the largest float available for this numpy
+        if hasattr(np, 'float128'):
+            large_float = np.float128
+        elif hasattr(np, 'float96'):
+            large_float = np.float96
         else:
-            kernels.append([])
-            for el in X.T: # por columnas
-                kernels[idx].append(estimateDensity(el[labels==lab], method=method))
-    return kernels, uniqLabels
-
-
-def createNewBrains(kernel, N, coef, mean, var=None):
-    if not isinstance(kernel, list):
-        newS = kernel.sample(N)
-    else:
-        newS = np.zeros((N, len(kernel)))
-        i = 0
-        for k in kernel:
-            newS[:,i] = k.sample(N).flatten()
-            i+=1
-    simStack = np.dot(newS, coef)
-    if var is not None:
-        simStack = simStack*var
-    simStack = simStack + mean
-    return simStack
+            large_float = np.float64
+            
+        l = 7
+        I = large_float(I)
+        M = large_float(M)
+        a2 = large_float(a2)
+        f = 2 * np.pi ** (2 * l) * np.sum(I ** l * a2 *
+                                          np.exp(-I * np.pi ** 2 * t))
+        for s in range(l, 1, -1):
+            K0 = np.prod(np.arange(1, 2 * s, 2)) / np.sqrt(2 * np.pi)
+            const = (1 + (1 / 2) ** (s + 1 / 2)) / 3
+            time = (2 * const * K0 / M / f) ** (2 / (3 + 2 * s))
+            f = 2 * np.pi ** (2 * s) * \
+                np.sum(I ** s * a2 * np.exp(-I * np.pi ** 2 * time))
+        return t - (2 * M * np.sqrt(np.pi) * f) ** (-2 / 5)
     
+    
+    def finite(self, val):
+        return val is not None and np.isfinite(val)
+    
+    def botev_bandwidth(self, data):
+        """
+        Implementation of the KDE bandwidth selection method outline in:
+    
+        Z. I. Botev, J. F. Grotowski, and D. P. Kroese. Kernel density
+        estimation via diffusion. The Annals of Statistics, 38(5):2916-2957, 2010.
+    
+        Based on the implementation of Daniel B. Smith, PhD.
+    
+        The object is a callable returning the bandwidth for a 1D kernel.
+        
+        Forked from the package PyQT_fit. 
+        """
+        from scipy import fftpack, optimize
+    #    def __init__(self, N=None, **kword):
+    #        if 'lower' in kword or 'upper' in kword:
+    #            print("Warning, using 'lower' and 'upper' for botev bandwidth is "
+    #                  "deprecated. Argument is ignored")
+    #        self.N = N
+    #
+    #    def __call__(self, data):#, model):
+    #        """
+    #        Returns the optimal bandwidth based on the data
+    #        """
+        N = 2 ** 10 #if self.N is None else int(2 ** np.ceil(np.log2(self.N)))
+    #        lower = getattr(model, 'lower', None)
+    #        upper = getattr(model, 'upper', None)
+    #        if not finite(lower) or not finite(upper):
+        minimum = np.min(data)
+        maximum = np.max(data)
+        span = maximum - minimum
+        lower = minimum - span / 10 #if not finite(lower) else lower
+        upper = maximum + span / 10 #if not finite(upper) else upper
+        # Range of the data
+        span = upper - lower
+    
+        # Histogram of the data to get a crude approximation of the density
+    #        weights = model.weights
+    #        if not weights.shape:
+        weights = None
+        M = len(data)
+        DataHist, bins = np.histogram(data, bins=N, range=(lower, upper), weights=weights)
+        DataHist = DataHist / M
+        DCTData = fftpack.dct(DataHist, norm=None)
+    
+        I = np.arange(1, N, dtype=int) ** 2
+        SqDCTData = (DCTData[1:] / 2) ** 2
+        guess = 0.1
+    
+        try:
+            t_star = optimize.brentq(self._botev_fixed_point, 0, guess,
+                                     args=(M, I, SqDCTData))
+        except ValueError:
+            t_star = .28 * N ** (-.4)
+    
+        return np.sqrt(t_star) * span
+    
+    def fit(self, x):
+        self.bandwidth = self.botev_bandwidth(x.flatten())
+        self.model.set_params(**{'bandwidth': self.bandwidth})
+        self.model.fit(x.reshape(-1,1))
+        
+    def sample(self, dimension = 1.0):
+        return self.model.sample(dimension)
 
-def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, uniqLabels=None, classes=None, SCORE=None, COEFF=None, MEAN=None, VAR=None, method='kde',regularize=False, verbose=False, n_comp=-1):
-    labels = labels.astype(int)
-    if classes==None:
-        classes = list(set(labels))
-    selection = np.array([x in classes for x in labels])
-    stack_fin = stack[selection,:]
-    if SCORE is None and COEFF is None and MEAN is None and kernels is not None: 
-        if(verbose):
+    def pdf(self, x):
+        return self.model.score_samples(x)
+
+class BrainSimulator:
+    
+    def __init__(self, method = 'kde', algorithm='PCA', N=100, n_comp=-1, regularize=False, verbose=False):
+        self.method = method #PDF estimation method
+        self.algorithm = algorithm # algorithm used to decompose the dataset (PCA, ICA)
+#        self.N = N # Number of samples per class
+        self.n_comp = n_comp # Number of components used in the estimation
+        self.verbose = verbose
+        self.regularize = regularize # Sets regularization of decomposition via ICA or PCA. 
+        self.kernels = None
+        self.uniqLabels = None
+        self.SCORE = None
+        self.COEFF = None
+        self.MEAN = None
+        self.VAR = None
+        
+        
+    def decompose(self, stack, labels): 
+        """
+        Performs the decomposition of the dataset. 
+        Inputs:
+            stack -> stack comprising the whole database to be decomposed
+            labels -> list (or array) containing the labels of each subject
+        """
+        if(self.verbose):
             print('Applying decomposition')
-        if algorithm=='PCA':
-            SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize, n_comp)
-        elif algorithm=='ICA':
-            SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize, n_comp)
-    if kernels==None:
-        if(verbose):
+        N_el = stack.shape[0]-1
+        if self.n_comp==-1:
+            self.n_comp = N_el
+        if self.algorithm=='PCA':
+            # Force to extract all components, and then extract the number of components in model
+            self.SCORE, self.COEFF, self.MEAN, self.VAR = applyPCA(stack, self.regularize, N_el)
+        elif self.algorithm=='ICA':
+            self.SCORE, self.COEFF, self.MEAN, self.VAR = applyICA(stack, self.regularize, self.n_comp)
+        
+        return self.SCORE, self.COEFF, self.MEAN, self.VAR
+
+    def estimateDensity(self, X):
+        """
+         Returns an estimator of the PDF of the current data. 
+         Inputs:
+             X -> the data from which the different kernels are fitted. 
+        """
+        if self.method is 'kde':
+            kernel = KDEestimator()
+        elif self.method is 'stable':
+    #        kernel = StableDist(1, 1, 0, 1)
+            print('Not yet supported')
+        elif self.method is 'gaussian':
+            kernel = GaussianEstimator()
+        kernel.fit(X)
+        return kernel
+    
+    def model(self, labels):
+        """
+        Models the per-class distribution of scores and sets the kernels. 
+        """
+        if(self.verbose):
             print('Creating Density Matrices')
-        kernels, uniqLabels = createDensityMatrices(SCORE, labels[selection], method=method)    
-    for clas in classes:
-        if(verbose):
-            print('Creating brains with class %d'%clas)
-        stackaux = createNewBrains(kernels[uniqLabels.index(clas)],N,COEFF,MEAN,VAR)
-        labelsaux = np.array([clas]*N)
-        if 'finStack' not in locals():
-            finStack = stackaux
-            labels = labelsaux
+        self.kernels = []    
+        # UniqLabels is key. Here the different class (either numbers or str)
+        # are held in different positions (ordered in number or alphabetic) and
+        # the kernels will saved in that very order. 
+        self.uniqLabels = list(set(labels)) 
+        for idx,lab in enumerate(self.uniqLabels):
+            if self.method is 'mvnormal':
+                kernel = MVNormalEstimator()
+                kernel.fit(self.SCORE[labels==lab,:self.n_comp]) 
+                self.kernels.append(kernel)
+            else:
+                self.kernels.append([])
+                for el in self.SCORE[:,:self.n_comp].T: # per column
+                    self.kernels[idx].append(self.estimateDensity(el[labels==lab]))
+        return self.kernels, self.uniqLabels
+            
+            
+    def fit(self, stack, labels):
+        """
+        Performs the fitting of the model, in order to draw samples afterwards
+        Inputs:
+            stack -> stack comprising the whole database to be decomposed
+            labels -> list (or array) containing the labels of each subject
+        """
+        labels = labels.astype(int)
+#        selection = np.array([x in self.classes for x in labels])
+#        stack_fin = stack[selection,:]
+#        labels_fin = labels[selection]
+        self.decompose(stack, labels)
+        self.model(labels)
+        
+    def is_fitted(self):
+        """ 
+        Returns true if the model has been fitted and is ready for use. 
+        """
+        checkVar = True
+        if self.kernels is None:
+            checkVar = False
+            
+        return checkVar
+    
+    def createNewBrains(self, N, kernel):
+        """
+        Creates new samples from the model. 
+        """
+        if not isinstance(kernel, list):
+            newS = self.kernel.sample(N)
         else:
-            finStack = np.vstack((finStack, stackaux))
-            labels = np.hstack((labels, labelsaux))
-    finStack[finStack<0]=0.
-    return labels, finStack
+            newS = np.zeros((N, len(kernel)))
+            i = 0
+            for k in kernel:
+                newS[:,i] = k.sample(N).flatten()
+                i+=1
+        simStack = np.dot(newS, self.COEFF[:self.n_comp,:])
+        if self.VAR is not None:
+            simStack = simStack*self.VAR
+        simStack = simStack + self.MEAN
+        return simStack     
+
+    def sample(self, N, clas=0):
+        """
+        Draw samples from the model. 
+        Inputs:
+            N -> number of subjects to be generated
+            clas -> model class ID
+        """
+        if(self.verbose):
+            print('Creating brains with class %d'%clas)
+        stackaux = self.createNewBrains(N,self.kernels[self.uniqLabels.index(clas)])
+        labelsaux = np.array([clas]*N)
+        return labelsaux, stackaux
+
+    
+    def generateDataset(self, stack, labels, N=100, classes=None):
+        """
+        Fits the model and generates a new set of N elements for each class
+        specified in "classes". 
+        Inputs:
+            stack -> the stack from which the model will be created
+            labels -> the labels of the stacked dataset
+            N -> the number of elements (per class) to be generated
+            classes -> the classes we want to generate
+        """
+        # If the model has not been fitted, fit it. 
+        import numbers
+        if not self.is_fitted():
+            if self.verbose:
+                print('Fitting the model')
+            self.fit(stack, labels)
+        # Classes input must correspond to the same numbers as labels
+        if classes==None:
+            clasdef = list(set(labels))
+        else:
+            if (isinstance(classes[0], numbers.Number) and isinstance(self.uniqLabels[0], numbers.Number)) or (type(classes[0]) is type(self.uniqLabels[0])):
+#                self.classes = []
+                clasdef = []
+                for el in classes:
+                    if el in self.uniqLabels:
+                        clasdef.append(self.uniqLabels.index(el))
+                    else:
+                        print('Error: specified class has not been modeled')
+            else:
+                print('Error: class not correctly specified')
+        for clas in clasdef:
+            labelsaux, stackaux = self.sample(N, clas)
+            if 'finStack' not in locals():
+                labels, finStack = labelsaux, stackaux
+            else:
+                finStack = np.vstack((finStack, stackaux))
+                labels = np.hstack((labels, labelsaux))
+            finStack[finStack<0]=0.
+        return labels, finStack
+
+#def generateDataset(stack, labels, N=100, algorithm='PCA', kernels=None, uniqLabels=None, classes=None, SCORE=None, COEFF=None, MEAN=None, VAR=None, method='kde',regularize=False, verbose=False, n_comp=-1):
+#    """
+#    labels -> labels of the dataset
+#    classes -> classes to be generated
+#    """
+#    labels = labels.astype(int)
+#    if classes==None:
+#        classes = list(set(labels))
+#    selection = np.array([x in classes for x in labels])
+#    stack_fin = stack[selection,:]
+#    if SCORE is None and COEFF is None and MEAN is None and kernels is not None: 
+#        if(verbose):
+#            print('Applying decomposition')
+#        if algorithm=='PCA':
+#            SCORE, COEFF, MEAN, VAR = applyPCA(stack_fin, regularize, n_comp)
+#        elif algorithm=='ICA':
+#            SCORE, COEFF, MEAN, VAR = applyICA(stack_fin, regularize, n_comp)
+#    if kernels==None:
+#        if(verbose):
+#            print('Creating Density Matrices')
+#        kernels, uniqLabels = createDensityMatrices(SCORE, labels[selection], method=method)    
+#    for clas in classes:
+#        if(verbose):
+#            print('Creating brains with class %d'%clas)
+#        stackaux = createNewBrains(N,kernels[uniqLabels.index(clas)])
+#        labelsaux = np.array([clas]*N)
+#        if 'finStack' not in locals():
+#            finStack = stackaux
+#            labels = labelsaux
+#        else:
+#            finStack = np.vstack((finStack, stackaux))
+#            labels = np.hstack((labels, labelsaux))
+#    finStack[finStack<0]=0.
+#    return labels, finStack
 #
