@@ -320,9 +320,9 @@ class BrainSimulator:
         Creates new samples from the model. 
         """
         if not isinstance(kernel, list):
-            newS = self.kernel.sample(N)
+            newS = kernel.sample(N)
         else:
-            newS = np.zeros((N, len(kernel)))
+            newS = np.zeros((int(N), len(kernel)))
             i = 0
             for k in kernel:
                 newS[:,i] = k.sample(N).flatten()
@@ -377,8 +377,11 @@ class BrainSimulator:
                         print('Error: specified class has not been modeled')
             else:
                 print('Error: class not correctly specified')
-        for clas in clasdef:
-            labelsaux, stackaux = self.sample(N, clas)
+        for ix, clas in enumerate(clasdef):
+            if type(N) is list:
+                labelsaux, stackaux = self.sample(N[ix], clas)
+            else:
+                labelsaux, stackaux = self.sample(N, clas)
             if 'finStack' not in locals():
                 labels, finStack = labelsaux, stackaux
             else:
