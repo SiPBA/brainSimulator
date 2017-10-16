@@ -365,16 +365,16 @@ class BrainSimulator:
             self.fit(stack, labels)
         # Classes input must correspond to the same numbers as labels
         if classes==None:
-            clasdef = list(set(labels))
+            clasdef = self.uniqLabels
         else:
             if (isinstance(classes[0], numbers.Number) and isinstance(self.uniqLabels[0], numbers.Number)) or (type(classes[0]) is type(self.uniqLabels[0])):
 #                self.classes = []
-                clasdef = []
-                for el in classes:
-                    if el in self.uniqLabels:
-                        clasdef.append(self.uniqLabels.index(el))
-                    else:
-                        print('Error: specified class has not been modeled')
+                clasdef = classes
+#                for el in classes:
+#                    if el in self.uniqLabels:
+#                        clasdef.append(self.uniqLabels.index(el))
+#                    else:
+#                        print('Error: specified class has not been modeled')
             else:
                 print('Error: class not correctly specified')
         for ix, clas in enumerate(clasdef):
