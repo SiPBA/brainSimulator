@@ -315,25 +315,26 @@ class BrainSimulator:
             
         return checkVar
     
-    def createNewBrains(self, N, kernel):
+    def createNewBrains(self, N, kernel, n_comp=None):
         """
         Creates new samples from the model. 
         """
+        if n_comp is None:
+            n_comp = self.n_comp
         if not isinstance(kernel, list):
             newS = kernel.sample(N)
         else:
-            newS = np.zeros((int(N), len(kernel)))
-            i = 0
-            for k in kernel:
+            newS = np.zeros((int(N), n_comp))
+            for i in range(n_comp):
+                k = kernel[i]
                 newS[:,i] = k.sample(N).flatten()
-                i+=1
-        simStack = np.dot(newS, self.COEFF[:self.n_comp,:])
+        simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
         if self.VAR is not None:
             simStack = simStack*self.VAR
         simStack = simStack + self.MEAN
         return simStack     
 
-    def sample(self, N, clas=0):
+    def sample(self, N, clas=0, n_comp=None):
         """
         Draw samples from the model. 
         Inputs:
@@ -342,12 +343,12 @@ class BrainSimulator:
         """
         if(self.verbose):
             print('Creating brains with class %d'%clas)
-        stackaux = self.createNewBrains(N,self.kernels[self.uniqLabels.index(clas)])
+        stackaux = self.createNewBrains(N, self.kernels[self.uniqLabels.index(clas)], n_comp)
         labelsaux = np.array([int(clas)]*N)
         return labelsaux, stackaux
 
     
-    def generateDataset(self, stack, labels, N=100, classes=None):
+    def generateDataset(self, stack, labels, N=100, classes=None, n_comp=None):
         """
         Fits the model and generates a new set of N elements for each class
         specified in "classes". 
@@ -356,6 +357,7 @@ class BrainSimulator:
             labels -> the labels of the stacked dataset
             N -> the number of elements (per class) to be generated
             classes -> the classes we want to generate
+            n_comp -> If we choose to change the number of components used in the synthesis
         """
         # If the model has not been fitted, fit it. 
         import numbers
@@ -379,9 +381,9 @@ class BrainSimulator:
                 print('Error: class not correctly specified')
         for ix, clas in enumerate(clasdef):
             if type(N) is list:
-                labelsaux, stackaux = self.sample(N[ix], clas)
+                labelsaux, stackaux = self.sample(N[ix], clas, n_comp)
             else:
-                labelsaux, stackaux = self.sample(N, clas)
+                labelsaux, stackaux = self.sample(N, clas, n_comp)
             if 'finStack' not in locals():
                 labels, finStack = labelsaux, stackaux
             else:
