@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 import numpy as np
+import numbers
 
 #Decomposition
 #Good reconstruction is np.dot(Spca, pca.components_)+pca.mean_
@@ -320,23 +321,26 @@ class BrainSimulator:
         Creates new samples from the model. 
         """
         import warnings
-        if n_comp> self.n_comp:
-            warnings.warn("The model used less components than specified. Using default n_comp="+str(self.n_comp))
-            n_comp = self.n_comp
         if n_comp is None:
             n_comp = self.n_comp
-        if not isinstance(kernel, list):
-            newS = kernel.sample(N)
-        else:
-            newS = np.zeros((int(N), n_comp))
-            for i in range(n_comp):
-                k = kernel[i]
-                newS[:,i] = k.sample(N).flatten()
-        simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
-        if self.VAR is not None:
-            simStack = simStack*self.VAR
-        simStack = simStack + self.MEAN
-        return simStack     
+        elif isinstance(n_comp, numbers.Number):
+            if n_comp> self.n_comp:
+                warnings.warn("The model used less components than specified. Using default n_comp="+str(self.n_comp))
+                n_comp = self.n_comp
+            if not isinstance(kernel, list):
+                newS = kernel.sample(N)
+            else:
+                newS = np.zeros((int(N), n_comp))
+                for i in range(n_comp):
+                    k = kernel[i]
+                    newS[:,i] = k.sample(N).flatten()
+            simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
+            if self.VAR is not None:
+                simStack = simStack*self.VAR
+            simStack = simStack + self.MEAN
+            return simStack   
+        else: 
+            raise ValueError('n_comp should be a number or None')  
 
     def sample(self, N, clas=0, n_comp=None):
         """
@@ -364,7 +368,6 @@ class BrainSimulator:
             n_comp -> If we choose to change the number of components used in the synthesis
         """
         # If the model has not been fitted, fit it. 
-        import numbers
         if not self.is_fitted():
             if self.verbose:
                 print('Fitting the model')
