@@ -319,6 +319,10 @@ class BrainSimulator:
         """
         Creates new samples from the model. 
         """
+        import warnings
+        if n_comp> self.n_comp:
+            warnings.warn("The model used less components than specified. Using default n_comp="+str(self.n_comp))
+            n_comp = self.n_comp
         if n_comp is None:
             n_comp = self.n_comp
         if not isinstance(kernel, list):
