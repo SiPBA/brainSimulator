@@ -327,20 +327,20 @@ class BrainSimulator:
             if n_comp> self.n_comp:
                 warnings.warn("The model used less components than specified. Using default n_comp="+str(self.n_comp))
                 n_comp = self.n_comp
-            if not isinstance(kernel, list):
-                newS = kernel.sample(N)
-            else:
-                newS = np.zeros((int(N), n_comp))
-                for i in range(n_comp):
-                    k = kernel[i]
-                    newS[:,i] = k.sample(N).flatten()
-            simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
-            if self.VAR is not None:
-                simStack = simStack*self.VAR
-            simStack = simStack + self.MEAN
-            return simStack   
         else: 
             raise ValueError('n_comp should be a number or None')  
+        if not isinstance(kernel, list):
+            newS = kernel.sample(N)
+        else:
+            newS = np.zeros((int(N), n_comp))
+            for i in range(n_comp):
+                k = kernel[i]
+                newS[:,i] = k.sample(N).flatten()
+        simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
+        if self.VAR is not None:
+            simStack = simStack*self.VAR
+        simStack = simStack + self.MEAN
+        return simStack   
 
     def sample(self, N, clas=0, n_comp=None):
         """
