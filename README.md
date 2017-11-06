@@ -1,4 +1,6 @@
 # brainSimulator
+[![DOI](https://zenodo.org/badge/85931767.svg)](https://zenodo.org/badge/latestdoi/85931767)
+
 Functional brain image synthesis using the KDE or MVN distribution. Currently in beta. Python code. 
 
 `brainSimulator` is a brain image synthesis procedure intended to generate a new image set that share characteristics with an original one. The system focuses on nuclear imaging modalities such as PET or SPECT brain images. It analyses the dataset by applying PCA to the original dataset, and then model the distribution of samples in the projected eigenbrain space using a Probability Density Function (PDF) estimator. Once the model has been built, anyone can generate new coordinates on the eigenbrain space belonging to the same class, which can be then projected back to the image space.
