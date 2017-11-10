@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Performs a simulation of functional neuroimaging based on parameters
-extracted from an existing dataset. 
+.. module:: brainSimulator
+    :platform: Unix, Windows
+    :synopsis: Performs a simulation of functional neuroimaging based on parameters extracted from an existing dataset. 
+
+.. moduleauthor: Francisco J. Martinez-Murcia <fjesusmartinez@ugr.es>
 
 Created on Thu Apr 28 15:53:15 2016
 Last update: 9 Aug, 2017
 
-@author: pakitochus
+@author: Francisco J. Martinez-Murcia <fjesusmartinez@ugr.es>
 
 Copyright (C) 2017 Francisco Jesús Martínez Murcia and SiPBA Research Group
 
@@ -31,6 +34,17 @@ import numbers
 #Good reconstruction is np.dot(Spca, pca.components_)+pca.mean_
 from sklearn.decomposition import PCA, FastICA
 def applyPCA(X, regularize=True, n_comp=-1):
+    """ This function applies PCA decomposition to a matrix containing all subjects to be modeled.
+    Args:
+        X (numpy.ndarray): The bidimensional array containing one image per row (conveniently vectorized)
+        regularize (bool): Whether or not to regularize (standardize) X. default=True. 
+        n_comp (int): Number of components to extract. If not specified, it will compute all available components except one.  
+    Returns:
+        Spca (numpy.ndarray): Array with the PCA decomposition of X. 
+        Components (numpy.ndarray): Array with the eigenvalues of the PCA decomposition of X.
+        Mean (numpy.ndarray): Vector with per-column average value. 
+        Variance (numpy.ndarray): Vector with per-column variance value. 
+    """
     if(regularize):
         mean_ = np.mean(X, axis=0)
         X = X - mean_
@@ -44,6 +58,17 @@ def applyPCA(X, regularize=True, n_comp=-1):
     return Spca, pca.components_, mean_, var_
     
 def applyICA(X, regularize=True, n_comp=-1):
+    """ This function applies ICA decomposition to a matrix containing all subjects to be modeled.
+    Args:
+        X (numpy.ndarray): The bidimensional array containing one image per row (conveniently vectorized)
+        regularize (bool): Whether or not to regularize (standardize) X. default=True. 
+        n_comp (int): Number of components to extract. If not specified, it will compute all available components except one.  
+    Returns:
+        Spca (numpy.ndarray): Array with the ICA decomposition of X. 
+        Components (numpy.ndarray): Array with the eigenvalues of the ICA decomposition of X.
+        Mean (numpy.ndarray): Vector with per-column average value. 
+        Variance (numpy.ndarray): Vector with per-column variance value. 
+    """
     if(regularize):
         mean_ = np.mean(X, axis=0)
         X = X - mean_
@@ -113,8 +138,9 @@ class MVNormalEstimator:
 #Density estimation 
 class KDEestimator:
     """
-    This class generates an interface for generating random numbers according
-    to a certain gaussian parametrization, estimated from the data
+    An interface for generating random numbers according
+    to a given Kernel Density Estimation (KDE) parametrization based on the 
+    data. 
     """
     def __init__(self, bandwidth=1.0):
         from sklearn.neighbors.kde import KernelDensity
@@ -146,20 +172,21 @@ class KDEestimator:
     
     
     def finite(self, val):
+        """ Checks if a value is finite or not """
         return val is not None and np.isfinite(val)
     
     def botev_bandwidth(self, data):
-        """
-        Implementation of the KDE bandwidth selection method outline in:
-    
-        Z. I. Botev, J. F. Grotowski, and D. P. Kroese. Kernel density
-        estimation via diffusion. The Annals of Statistics, 38(5):2916-2957, 2010.
-    
-        Based on the implementation of Daniel B. Smith, PhD.
-    
-        The object is a callable returning the bandwidth for a 1D kernel.
+        """ Implementation of the KDE bandwidth selection method outline in:
+            
+        Z. I. Botev, J. F. Grotowski, and D. P. Kroese. *Kernel density estimation via diffusion.* The Annals of Statistics, 38(5):2916-2957, 2010.
+
+        Based on the implementation of Daniel B. Smith, PhD. The object is a callable returning the bandwidth for a 1D kernel.
         
-        Forked from the package PyQT_fit. 
+        Forked from the package `PyQT_fit <https://code.google.com/archive/p/pyqt-fit/>`. 
+        
+        :param data: 1D array containing the data to model with a 1D KDE. 
+        :type data: numpy.ndarray
+        :returns: Optimal bandwidth according to the data. 
         """
         from scipy import fftpack, optimize
     #    def __init__(self, N=None, **kword):
@@ -316,27 +343,27 @@ class BrainSimulator:
             
         return checkVar
     
-    def createNewBrains(self, N, kernel, n_comp=None):
+    def createNewBrains(self, N, kernel, components=None):
         """
         Creates new samples from the model. 
         """
         import warnings
-        if n_comp is None:
-            n_comp = self.n_comp
-        elif isinstance(n_comp, numbers.Number):
-            if n_comp> self.n_comp:
+        if components is None:
+            components = self.n_comp
+        elif isinstance(components, numbers.Number):
+            if components> self.n_comp:
                 warnings.warn("The model used less components than specified. Using default n_comp="+str(self.n_comp))
-                n_comp = self.n_comp
+                components = self.n_comp
         else: 
             raise ValueError('n_comp should be a number or None')  
         if not isinstance(kernel, list):
             newS = kernel.sample(N)
         else:
-            newS = np.zeros((int(N), n_comp))
-            for i in range(n_comp):
+            newS = np.zeros((int(N), components))
+            for i in range(components):
                 k = kernel[i]
                 newS[:,i] = k.sample(N).flatten()
-        simStack = np.dot(newS[:,:n_comp], self.COEFF[:n_comp,:])
+        simStack = np.dot(newS[:,:components], self.COEFF[:components,:])
         if self.VAR is not None:
             simStack = simStack*self.VAR
         simStack = simStack + self.MEAN
@@ -356,16 +383,22 @@ class BrainSimulator:
         return labelsaux, stackaux
 
     
-    def generateDataset(self, stack, labels, N=100, classes=None, n_comp=None):
+    def generateDataset(self, stack, labels, N=100, classes=None, components=None):
         """
         Fits the model and generates a new set of N elements for each class
         specified in "classes". 
-        Inputs:
-            stack -> the stack from which the model will be created
-            labels -> the labels of the stacked dataset
-            N -> the number of elements (per class) to be generated
-            classes -> the classes we want to generate
-            n_comp -> If we choose to change the number of components used in the synthesis
+        
+        :param stack: the stack from which the model will be created
+        :type stack: numpy.ndarray
+        :param labels: a vector containing the labels of the stacked dataset
+        :type labels: numpy.ndarray
+        :param N: the number of elements (per class) to be generated
+        :type N: either int (the same N will be generated per class) or a list of the same length as `classes` containing the number of subjects to be generated for each class respectively. 
+        :param classes: the classes that we aim to generate
+        :type classes: a list of the classes to be generated, e.g.: `[0, 2]` or `['AD', 'CTL']`.
+        :param components: the number of components used in the synthesis. This parameter is only valid if `components` here is smaller than the `n_comp` specified when creating and fitting the `BrainSimulator`object.
+        :type components: integer
+        :returns: array with labels of the synthetic stack
         """
         # If the model has not been fitted, fit it. 
         if not self.is_fitted():
@@ -388,9 +421,9 @@ class BrainSimulator:
                 print('Error: class not correctly specified')
         for ix, clas in enumerate(clasdef):
             if type(N) is list:
-                labelsaux, stackaux = self.sample(N[ix], clas, n_comp)
+                labelsaux, stackaux = self.sample(N[ix], clas, components)
             else:
-                labelsaux, stackaux = self.sample(N, clas, n_comp)
+                labelsaux, stackaux = self.sample(N, clas, components)
             if 'finStack' not in locals():
                 labels, finStack = labelsaux, stackaux
             else:
