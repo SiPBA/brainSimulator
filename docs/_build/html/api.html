@@ -68,6 +68,194 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License
 along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<div class="section" id="class-brainsimulator">
+<h2>class brainSimulator<a class="headerlink" href="#class-brainsimulator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="brainSimulator.BrainSimulator">
+<em class="property">class </em><code class="descclassname">brainSimulator.</code><code class="descname">BrainSimulator</code><span class="sig-paren">(</span><em>method='kde'</em>, <em>algorithm='PCA'</em>, <em>N=100</em>, <em>n_comp=-1</em>, <em>regularize=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="brainSimulator.BrainSimulator.createNewBrains">
+<code class="descname">createNewBrains</code><span class="sig-paren">(</span><em>N</em>, <em>kernel</em>, <em>components=None</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.createNewBrains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates new samples in the eigenbrain space and projects back to 
+the image space for a given kernel and a specified number of 
+components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>N</strong> (<em>integer</em>) – Number of samples to draw from that class</li>
+<li><strong>kernel</strong> (<cite>KDEestimator</cite>, <cite>MVNormalEstimator</cite> or         <cite>GaussianEstimator</cite>) – kernel or list of kernels to generate new samples</li>
+<li><strong>components</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Number of components to be used in the         reconstruction of the images.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>simStack</strong> - a <cite>stack</cite> or numpy.ndarray containing <cite>N</cite>         vectorized images in rows.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.decompose">
+<code class="descname">decompose</code><span class="sig-paren">(</span><em>stack</em>, <em>labels</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.decompose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies PCA or ICA decomposition of the dataset.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stack</strong> (<em>numpy.ndarray</em>) – stack of vectorized images comprising the whole database to be decomposed</li>
+<li><strong>labels</strong> (<em>list</em><em> or </em><em>numpy.ndarray</em>) – labels of each subject in <cite>stack</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>SCORE</strong> - A matrix of component scores</li>
+<li><strong>COEFF</strong> - The matrix of component loadings.</li>
+<li><strong>MEAN</strong> - If standardized, the mean vector of all samples.</li>
+<li><strong>VAR</strong> - If standardized, the variance of all samples.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.estimateDensity">
+<code class="descname">estimateDensity</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.estimateDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an estimator of the PDF of the current data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>X</strong> (<em>numpy.ndarray</em>) – the data from which the different kernels are fitted.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the trained kernel estimated for <cite>X</cite></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>stack</em>, <em>labels</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the fitting of the model, in order to draw samples afterwards.
+It applies the functions <cite>self.decompose</cite> and <cite>self.model</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>stack</strong> (<em>numpy.ndarray</em>) – stack of vectorized images comprising the whole database to be decomposed</li>
+<li><strong>labels</strong> (<em>list</em><em> or </em><em>numpy.ndarray</em>) – labels of each subject in <cite>stack</cite></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.generateDataset">
+<code class="descname">generateDataset</code><span class="sig-paren">(</span><em>stack=None</em>, <em>labels=None</em>, <em>N=100</em>, <em>classes=None</em>, <em>components=None</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.generateDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fits the model and generates a new set of N elements for each class
+specified in “classes”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stack</strong> (<em>numpy.ndarray</em>) – the stack from which the model will be created</li>
+<li><strong>labels</strong> (<em>numpy.ndarray</em>) – a vector containing the labels of the stacked dataset</li>
+<li><strong>N</strong> (either int (the same N will be generated per class) or a list        of the same length as <cite>classes</cite> containing the number of subjects to         be generated for each class respectively.) – the number of elements (per class) to be generated</li>
+<li><strong>classes</strong> (a list of the classes to be generated, e.g.: <cite>[0, 2]</cite>         or <cite>[‘AD’, ‘CTL’]</cite>.) – the classes that we aim to generate</li>
+<li><strong>components</strong> (<em>integer</em>) – the number of components used in the synthesis.         This parameter is only valid if <cite>components</cite> here is smaller than the        <cite>n_comp</cite> specified when creating and fitting the <cite>BrainSimulator</cite>        object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>labels</strong> - numpy.ndarray vector with labels for <cite>stack</cite></li>
+<li><strong>stack</strong> - a <cite>stack</cite> or numpy.ndarray containing all synthetic             images (N per clas <cite>clas</cite>) in rows.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.model">
+<code class="descname">model</code><span class="sig-paren">(</span><em>labels</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Models the per-class distribution of scores and sets the kernels. Uses
+the internally stored <cite>SCORE</cite> matrix, once the decomposition is applied</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>labels</strong> (<cite>list</cite> or numpy.ndarray) – labels of each subject in <cite>stack</cite></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><strong>kernels</strong> - a multivariate <cite>kernel</cite> or list of kernels,             depending on the model.</li>
+<li><strong>uniqLabels</strong> - unique labels used to create a standard object.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="brainSimulator.BrainSimulator.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>N</em>, <em>clas=0</em>, <em>n_comp=None</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard method that draws samples from the model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>N</strong> (<em>integer</em>) – number of samples to be generated for each class.</li>
+<li><strong>clas</strong> (<em>integer</em>) – class (according to <cite>self.uniqLabels</cite>) of the images to         be generated.</li>
+<li><strong>n_comp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Number of components to be used in the         reconstruction of the images.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>labels</strong> - numpy.ndarray vector with <cite>N</cite> labels of <cite>clas</cite></li>
+<li><strong>stack</strong> - a <cite>stack</cite> or numpy.ndarray containing <cite>N</cite>             vectorized images of clas <cite>clas</cite> in rows.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="auxiliary-classes">
+<h2>auxiliary classes<a class="headerlink" href="#auxiliary-classes" title="Permalink to this headline">¶</a></h2>
+<p>These auxiliary classes define the PDF models that will be applied in the analysis and synthesis of brain images. All feature a set of methods <cite>.fit</cite> and <cite>.sample</cite> that in the case of MVN and Gaussian are a simple interface for their <cite>scipy</cite> counterparts, while for the KDE, it uses automatic estimation of bandwidth and defines more auxiliary functions. See a further discussion of these in the original paper.</p>
+<dl class="class">
+<dt id="brainSimulator.MVNormalEstimator">
+<em class="property">class </em><code class="descclassname">brainSimulator.</code><code class="descname">MVNormalEstimator</code><span class="sig-paren">(</span><em>mean=0.0</em>, <em>cov=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.MVNormalEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class creates an interface for generating random numbers according
+to a given multivariate normal parametrization, estimated from the data
+Works only with python 3.4+ (due to numpy matrix multiplication)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="brainSimulator.GaussianEstimator">
+<em class="property">class </em><code class="descclassname">brainSimulator.</code><code class="descname">GaussianEstimator</code><span class="sig-paren">(</span><em>mean=0.0</em>, <em>var=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.GaussianEstimator" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class generates an interface for generating random numbers according
+to a per-component gaussian parametrization, estimated from the data</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="brainSimulator.KDEestimator">
 <em class="property">class </em><code class="descclassname">brainSimulator.</code><code class="descname">KDEestimator</code><span class="sig-paren">(</span><em>bandwidth=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.KDEestimator" title="Permalink to this definition">¶</a></dt>
@@ -85,7 +273,7 @@ data.</p>
 </li>
 </ol>
 <p>Based on the implementation of Daniel B. Smith, PhD. The object is a callable returning the bandwidth for a 1D kernel.</p>
-<p>Forked from the package <cite>PyQT_fit &lt;https://code.google.com/archive/p/pyqt-fit/&gt;</cite>.</p>
+<p>Forked from the package <a class="reference external" href="https://code.google.com/archive/p/pyqt-fit/">PyQT_fit</a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -98,50 +286,68 @@ data.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="brainSimulator.KDEestimator.finite">
-<code class="descname">finite</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.KDEestimator.finite" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if a value is finite or not</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="brainSimulator.BrainSimulator">
-<em class="property">class </em><code class="descclassname">brainSimulator.</code><code class="descname">BrainSimulator</code><span class="sig-paren">(</span><em>method='kde'</em>, <em>algorithm='PCA'</em>, <em>N=100</em>, <em>n_comp=-1</em>, <em>regularize=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="brainSimulator.BrainSimulator.createNewBrains">
-<code class="descname">createNewBrains</code><span class="sig-paren">(</span><em>N</em>, <em>kernel</em>, <em>components=None</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.createNewBrains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates new samples from the model.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="brainSimulator.BrainSimulator.generateDataset">
-<code class="descname">generateDataset</code><span class="sig-paren">(</span><em>stack</em>, <em>labels</em>, <em>N=100</em>, <em>classes=None</em>, <em>components=None</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.BrainSimulator.generateDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fits the model and generates a new set of N elements for each class
-specified in “classes”.</p>
+</div>
+<div class="section" id="auxiliary-functions">
+<h2>auxiliary functions<a class="headerlink" href="#auxiliary-functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="brainSimulator.applyPCA">
+<code class="descclassname">brainSimulator.</code><code class="descname">applyPCA</code><span class="sig-paren">(</span><em>X</em>, <em>regularize=True</em>, <em>n_comp=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.applyPCA" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function applies PCA decomposition to a matrix containing all subjects to be modeled.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stack</strong> (<em>numpy.ndarray</em>) – the stack from which the model will be created</li>
-<li><strong>labels</strong> (<em>numpy.ndarray</em>) – a vector containing the labels of the stacked dataset</li>
-<li><strong>N</strong> (either int (the same N will be generated per class) or a list of the same length as <cite>classes</cite> containing the number of subjects to be generated for each class respectively.) – the number of elements (per class) to be generated</li>
-<li><strong>classes</strong> (a list of the classes to be generated, e.g.: <cite>[0, 2]</cite> or <cite>[‘AD’, ‘CTL’]</cite>.) – the classes that we aim to generate</li>
-<li><strong>components</strong> (<em>integer</em>) – the number of components used in the synthesis. This parameter is only valid if <cite>components</cite> here is smaller than the <cite>n_comp</cite> specified when creating and fitting the <a href="#id1"><span class="problematic" id="id2">`</span></a>BrainSimulator`object.</li>
+<li><strong>X</strong> (<em>numpy.ndarray</em>) – The bidimensional array containing one image per row (conveniently vectorized)</li>
+<li><strong>regularize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Whether or not to regularize (standardize) X. default=True.</li>
+<li><strong>n_comp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Number of components to extract. If not specified, it will compute all available components except one.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">array with labels of the synthetic stack</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>Spca</strong> (numpy.ndarray): Array with the PCA decomposition of X.</li>
+<li><strong>Components</strong> (numpy.ndarray): Array with the eigenvalues of the PCA         decomposition of X.</li>
+<li><strong>Mean</strong> (numpy.ndarray): Vector with per-column average value.</li>
+<li><strong>Variance</strong> (numpy.ndarray): Vector with per-column variance value.</li>
+</ul>
+</p>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="brainSimulator.applyICA">
+<code class="descclassname">brainSimulator.</code><code class="descname">applyICA</code><span class="sig-paren">(</span><em>X</em>, <em>regularize=True</em>, <em>n_comp=-1</em><span class="sig-paren">)</span><a class="headerlink" href="#brainSimulator.applyICA" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function applies ICA decomposition to a matrix containing all subjects to be modeled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>numpy.ndarray</em>) – The bidimensional array containing one image per row (conveniently vectorized)</li>
+<li><strong>regularize</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Whether or not to regularize (standardize) X. default=True.</li>
+<li><strong>n_comp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – Number of components to extract. If not specified, it will compute all available components except one.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>Spca</strong> (numpy.ndarray): Array with the ICA decomposition of X.</li>
+<li><strong>Components</strong> (numpy.ndarray): Array with the eigenvalues of the ICA         decomposition of X.</li>
+<li><strong>Mean</strong> (numpy.ndarray): Vector with per-column average value.</li>
+<li><strong>Variance</strong> (numpy.ndarray): Vector with per-column variance value.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
+</div>
 </div>
 
 
@@ -150,6 +356,16 @@ specified in “classes”.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">brainSimulator’s API</a><ul>
+<li><a class="reference internal" href="#class-brainsimulator">class brainSimulator</a></li>
+<li><a class="reference internal" href="#auxiliary-classes">auxiliary classes</a></li>
+<li><a class="reference internal" href="#auxiliary-functions">auxiliary functions</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="synthesizing.html"
                         title="previous chapter">Synthesizing new brain images</a></p>
@@ -190,7 +406,7 @@ specified in “classes”.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, SiPBA@UGR.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
     </div>
   </body>
 </html>

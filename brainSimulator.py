@@ -34,16 +34,21 @@ import numbers
 #Good reconstruction is np.dot(Spca, pca.components_)+pca.mean_
 from sklearn.decomposition import PCA, FastICA
 def applyPCA(X, regularize=True, n_comp=-1):
-    """ This function applies PCA decomposition to a matrix containing all subjects to be modeled.
-    Args:
-        X (numpy.ndarray): The bidimensional array containing one image per row (conveniently vectorized)
-        regularize (bool): Whether or not to regularize (standardize) X. default=True. 
-        n_comp (int): Number of components to extract. If not specified, it will compute all available components except one.  
-    Returns:
-        Spca (numpy.ndarray): Array with the PCA decomposition of X. 
-        Components (numpy.ndarray): Array with the eigenvalues of the PCA decomposition of X.
-        Mean (numpy.ndarray): Vector with per-column average value. 
-        Variance (numpy.ndarray): Vector with per-column variance value. 
+    """ 
+    This function applies PCA decomposition to a matrix containing all subjects to be modeled.
+    
+    :param X: The bidimensional array containing one image per row (conveniently vectorized)
+    :type X: numpy.ndarray
+    :param regularize: Whether or not to regularize (standardize) X. default=True. 
+    :type regularize: bool
+    :param n_comp: Number of components to extract. If not specified, it will compute all available components except one.  
+    :type n_comp: int
+    :returns:
+        * **Spca** (numpy.ndarray): Array with the PCA decomposition of X. 
+        * **Components** (numpy.ndarray): Array with the eigenvalues of the PCA \
+        decomposition of X.
+        * **Mean** (numpy.ndarray): Vector with per-column average value. 
+        * **Variance** (numpy.ndarray): Vector with per-column variance value. 
     """
     if(regularize):
         mean_ = np.mean(X, axis=0)
@@ -58,16 +63,21 @@ def applyPCA(X, regularize=True, n_comp=-1):
     return Spca, pca.components_, mean_, var_
     
 def applyICA(X, regularize=True, n_comp=-1):
-    """ This function applies ICA decomposition to a matrix containing all subjects to be modeled.
-    Args:
-        X (numpy.ndarray): The bidimensional array containing one image per row (conveniently vectorized)
-        regularize (bool): Whether or not to regularize (standardize) X. default=True. 
-        n_comp (int): Number of components to extract. If not specified, it will compute all available components except one.  
-    Returns:
-        Spca (numpy.ndarray): Array with the ICA decomposition of X. 
-        Components (numpy.ndarray): Array with the eigenvalues of the ICA decomposition of X.
-        Mean (numpy.ndarray): Vector with per-column average value. 
-        Variance (numpy.ndarray): Vector with per-column variance value. 
+    """ 
+    This function applies ICA decomposition to a matrix containing all subjects to be modeled.
+    
+    :param X: The bidimensional array containing one image per row (conveniently vectorized)
+    :type X: numpy.ndarray
+    :param regularize: Whether or not to regularize (standardize) X. default=True. 
+    :type regularize: bool
+    :param n_comp: Number of components to extract. If not specified, it will compute all available components except one.  
+    :type n_comp: int
+    :returns:
+        * **Spca** (numpy.ndarray): Array with the ICA decomposition of X. 
+        * **Components** (numpy.ndarray): Array with the eigenvalues of the ICA \
+        decomposition of X.
+        * **Mean** (numpy.ndarray): Vector with per-column average value. 
+        * **Variance** (numpy.ndarray): Vector with per-column variance value. 
     """
     if(regularize):
         mean_ = np.mean(X, axis=0)
@@ -182,7 +192,7 @@ class KDEestimator:
 
         Based on the implementation of Daniel B. Smith, PhD. The object is a callable returning the bandwidth for a 1D kernel.
         
-        Forked from the package `PyQT_fit <https://code.google.com/archive/p/pyqt-fit/>`. 
+        Forked from the package `PyQT_fit <https://code.google.com/archive/p/pyqt-fit/>`_. 
         
         :param data: 1D array containing the data to model with a 1D KDE. 
         :type data: numpy.ndarray
@@ -262,10 +272,17 @@ class BrainSimulator:
         
     def decompose(self, stack, labels): 
         """
-        Performs the decomposition of the dataset. 
-        Inputs:
-            stack -> stack comprising the whole database to be decomposed
-            labels -> list (or array) containing the labels of each subject
+        Applies PCA or ICA decomposition of the dataset. 
+        
+        :param stack: stack of vectorized images comprising the whole database to be decomposed
+        :type stack: numpy.ndarray
+        :param labels: labels of each subject in `stack`
+        :type labels: list or numpy.ndarray
+        :returns: 
+            * **SCORE** - A matrix of component scores
+            * **COEFF** - The matrix of component loadings.
+            * **MEAN** - If standardized, the mean vector of all samples.
+            * **VAR** - If standardized, the variance of all samples. 
         """
         if(self.verbose):
             print('Applying decomposition')
@@ -283,8 +300,11 @@ class BrainSimulator:
     def estimateDensity(self, X):
         """
          Returns an estimator of the PDF of the current data. 
-         Inputs:
-             X -> the data from which the different kernels are fitted. 
+         
+         :param X: the data from which the different kernels are fitted. 
+         :type X: numpy.ndarray
+         :returns:
+             the trained kernel estimated for `X`
         """
         if self.method is 'kde':
             kernel = KDEestimator()
@@ -298,7 +318,15 @@ class BrainSimulator:
     
     def model(self, labels):
         """
-        Models the per-class distribution of scores and sets the kernels. 
+        Models the per-class distribution of scores and sets the kernels. Uses
+        the internally stored `SCORE` matrix, once the decomposition is applied
+        
+        :param labels: labels of each subject in `stack`
+        :type labels: `list` or numpy.ndarray
+        :returns: 
+            * **kernels** - a multivariate `kernel` or list of kernels, \
+            depending on the model. 
+            * **uniqLabels** - unique labels used to create a standard object.
         """
         if(self.verbose):
             print('Creating Density Matrices')
@@ -321,10 +349,13 @@ class BrainSimulator:
             
     def fit(self, stack, labels):
         """
-        Performs the fitting of the model, in order to draw samples afterwards
-        Inputs:
-            stack -> stack comprising the whole database to be decomposed
-            labels -> list (or array) containing the labels of each subject
+        Performs the fitting of the model, in order to draw samples afterwards.
+        It applies the functions `self.decompose` and `self.model`
+        
+        :param stack: stack of vectorized images comprising the whole database to be decomposed
+        :type stack: numpy.ndarray
+        :param labels: labels of each subject in `stack`
+        :type labels: list or numpy.ndarray
         """
         labels = labels.astype(int)
 #        selection = np.array([x in self.classes for x in labels])
@@ -345,7 +376,20 @@ class BrainSimulator:
     
     def createNewBrains(self, N, kernel, components=None):
         """
-        Creates new samples from the model. 
+        Generates new samples in the eigenbrain space and projects back to 
+        the image space for a given kernel and a specified number of 
+        components. 
+        
+        :param N: Number of samples to draw from that class
+        :type N: integer
+        :param kernel: kernel or list of kernels to generate new samples
+        :type kernel: `KDEestimator`, `MVNormalEstimator` or \
+        `GaussianEstimator`
+        :param components: Number of components to be used in the \
+        reconstruction of the images.
+        :type components: int
+        :returns: **simStack** - a `stack` or numpy.ndarray containing `N` \
+        vectorized images in rows. 
         """
         import warnings
         if components is None:
@@ -371,10 +415,20 @@ class BrainSimulator:
 
     def sample(self, N, clas=0, n_comp=None):
         """
-        Draw samples from the model. 
-        Inputs:
-            N -> number of subjects to be generated
-            clas -> model class ID
+        Standard method that draws samples from the model.
+        
+        :param N: number of samples to be generated for each class.
+        :type N: integer
+        :param clas: class (according to `self.uniqLabels`) of the images to \
+        be generated. 
+        :type clas: integer
+        :param n_comp: Number of components to be used in the \
+        reconstruction of the images.
+        :type n_comp: int
+        :returns:
+            * **labels** - numpy.ndarray vector with `N` labels of `clas`
+            * **stack** - a `stack` or numpy.ndarray containing `N` \
+            vectorized images of clas `clas` in rows. 
         """
         if(self.verbose):
             print('Creating brains with class %d'%clas)
@@ -383,7 +437,7 @@ class BrainSimulator:
         return labelsaux, stackaux
 
     
-    def generateDataset(self, stack, labels, N=100, classes=None, components=None):
+    def generateDataset(self, stack=None, labels=None, N=100, classes=None, components=None):
         """
         Fits the model and generates a new set of N elements for each class
         specified in "classes". 
@@ -393,12 +447,21 @@ class BrainSimulator:
         :param labels: a vector containing the labels of the stacked dataset
         :type labels: numpy.ndarray
         :param N: the number of elements (per class) to be generated
-        :type N: either int (the same N will be generated per class) or a list of the same length as `classes` containing the number of subjects to be generated for each class respectively. 
+        :type N: either int (the same N will be generated per class) or a list\
+        of the same length as `classes` containing the number of subjects to \
+        be generated for each class respectively. 
         :param classes: the classes that we aim to generate
-        :type classes: a list of the classes to be generated, e.g.: `[0, 2]` or `['AD', 'CTL']`.
-        :param components: the number of components used in the synthesis. This parameter is only valid if `components` here is smaller than the `n_comp` specified when creating and fitting the `BrainSimulator`object.
+        :type classes: a list of the classes to be generated, e.g.: `[0, 2]` \
+        or `['AD', 'CTL']`.
+        :param components: the number of components used in the synthesis. \
+        This parameter is only valid if `components` here is smaller than the\
+        `n_comp` specified when creating and fitting the `BrainSimulator`\
+        object.
         :type components: integer
-        :returns: array with labels of the synthetic stack
+        :returns:
+            * **labels** - numpy.ndarray vector with labels for `stack`
+            * **stack** - a `stack` or numpy.ndarray containing all synthetic \
+            images (N per clas `clas`) in rows. 
         """
         # If the model has not been fitted, fit it. 
         if not self.is_fitted():

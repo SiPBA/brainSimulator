@@ -1,25 +1,48 @@
 \begin{sphinxtheindex}
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
 
+  \bigletter A
+  \item applyICA() (in module brainSimulator), \hyperpage{12}
+  \item applyPCA() (in module brainSimulator), \hyperpage{11}
+
+  \indexspace
   \bigletter B
-  \item botev\_bandwidth() (brainSimulator.KDEestimator method), \hyperpage{1}
-  \item BrainSimulator (class in brainSimulator), \hyperpage{1}
-  \item brainSimulator (module), \hyperpage{1}
+  \item botev\_bandwidth() (brainSimulator.KDEestimator method), \hyperpage{11}
+  \item BrainSimulator (class in brainSimulator), \hyperpage{9}
+  \item brainSimulator (module), \hyperpage{5}, \hyperpage{9}
 
   \indexspace
   \bigletter C
-  \item createNewBrains() (brainSimulator.BrainSimulator method), \hyperpage{1}
+  \item createNewBrains() (brainSimulator.BrainSimulator method), \hyperpage{9}
+
+  \indexspace
+  \bigletter D
+  \item decompose() (brainSimulator.BrainSimulator method), \hyperpage{9}
+
+  \indexspace
+  \bigletter E
+  \item estimateDensity() (brainSimulator.BrainSimulator method), \hyperpage{10}
 
   \indexspace
   \bigletter F
-  \item finite() (brainSimulator.KDEestimator method), \hyperpage{1}
+  \item fit() (brainSimulator.BrainSimulator method), \hyperpage{10}
 
   \indexspace
   \bigletter G
-  \item generateDataset() (brainSimulator.BrainSimulator method), \hyperpage{1}
+  \item GaussianEstimator (class in brainSimulator), \hyperpage{11}
+  \item generateDataset() (brainSimulator.BrainSimulator method), \hyperpage{10}
 
   \indexspace
   \bigletter K
-  \item KDEestimator (class in brainSimulator), \hyperpage{1}
+  \item KDEestimator (class in brainSimulator), \hyperpage{11}
+
+  \indexspace
+  \bigletter M
+  \item model() (brainSimulator.BrainSimulator method), \hyperpage{10}
+  \item MVNormalEstimator (class in brainSimulator), \hyperpage{11}
+
+  \indexspace
+  \bigletter S
+  \item sample() (brainSimulator.BrainSimulator method), \hyperpage{10}
 
 \end{sphinxtheindex}

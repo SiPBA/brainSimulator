@@ -54,14 +54,59 @@
             
   <div class="section" id="brainsimulator-s-overview">
 <h1>BrainSimulator’s Overview<a class="headerlink" href="#brainsimulator-s-overview" title="Permalink to this headline">¶</a></h1>
-<p>With the new version, the whole interface has been switched to an object. This allows to train the model once and then perform as many sample drawings as required:</p>
+<p><cite>brainSimulator</cite> is a brain image synthesis procedure intended to generate a new image set that share characteristics with an original one. The system focuses on nuclear imaging modalities such as PET or SPECT brain images. It analyses the dataset by applying PCA to the original dataset, and then model the distribution of samples in the projected eigenbrain space using a Probability Density Function (PDF) estimator. Once the model has been built, anyone can generate new coordinates on the eigenbrain space belonging to the same class, which can be then projected back to the image space.</p>
+<div class="figure align-center" style="width: 70%">
+<img alt="Schema of the synthesis methodology." src="_images/schema.png" />
+</div>
+<div class="section" id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-stack">
+<h3>The “stack”<a class="headerlink" href="#the-stack" title="Permalink to this headline">¶</a></h3>
+<p>The first key concept here is a <strong>stack</strong>. A <cite>stack</cite> is a bidimensional <cite>numpy.ndarray</cite> of size <cite>N`x`K</cite>, where <cite>N</cite> is the number of brain images available and <cite>K</cite> is the number of voxels in each image. It is <strong>important</strong> to remark that all images must have been registered to the same brain space (<em>recommendation: use MNI space</em>). Use a similar code to this to generate a stack:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="k">as</span> <span class="nn">nib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">create_stack</span><span class="p">(</span><span class="n">list_images</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_images</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">list_images</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">nib</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_label</span><span class="p">(</span><span class="n">im</span><span class="p">)</span> <span class="c1"># get the image label</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">stack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">datos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+                <span class="n">stack</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,:,:]</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">stack</span><span class="p">,</span> <span class="n">labels</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="creating-the-brainsimulator-object">
+<h3>Creating the brainSimulator object<a class="headerlink" href="#creating-the-brainsimulator-object" title="Permalink to this headline">¶</a></h3>
+<p>With the new version, the whole interface has been switched to an object. This allows to train the model once and then perform as many sample drawings as required. To do so, we simply navigate to the folder where the simulator.py is located (if that folder is added to the path, that is not necessary), and import the module:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#navigate to the folder where simulator.py is located</span>
 <span class="kn">import</span> <span class="nn">brainSimulator</span> <span class="k">as</span> <span class="nn">sim</span>
 
 <span class="n">simulator</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">BrainSimulator</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="s1">&#39;PCA&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mvnormal&#39;</span><span class="p">)</span>
-<span class="n">simulator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-<span class="n">images</span><span class="p">,</span> <span class="n">classes</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">generateDataset</span><span class="p">(</span><span class="n">original_dataset</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 </pre></div>
+</div>
+<p>There are different PDF modelling methods: <cite>mvnormal</cite>, <cite>gaussian</cite> and <cite>kde</cite>. Other methods based on alpha-stable distribution are planned for the future. The most accurate method is the <cite>mvnormal</cite>, but it requires some further tuning of the parameters. A high number of components may lead to overfitting, producing, when n_comp tends to infinity, always the average image of each class. For its part, the <cite>kde</cite> method is less accurate, but it works essentialy <em>out of the box</em>. Use them at your discrection.</p>
+</div>
+<div class="section" id="fitting-the-model">
+<h3>Fitting the model<a class="headerlink" href="#fitting-the-model" title="Permalink to this headline">¶</a></h3>
+<p>Once the object has been created, we use the <cite>stack</cite> and its labels to fit the model:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">simulator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This procedure may take some time, depending on the PDF estimation method.</p>
+</div>
+<div class="section" id="generating-a-new-dataset">
+<h3>Generating a new dataset<a class="headerlink" href="#generating-a-new-dataset" title="Permalink to this headline">¶</a></h3>
+<p>Once the fitting procedure has finalised, you can generate a new dataset using the trained object:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">new_stack</span><span class="p">,</span> <span class="n">new_labels</span> <span class="o">=</span> <span class="n">simulator</span><span class="o">.</span><span class="n">generateDataset</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">classes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>This will generate 200 new samples for each class in 0, 1 and 2, ready to use in our favourite machine learning algorithm.</p>
+</div>
 </div>
 </div>
 
@@ -71,6 +116,20 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">BrainSimulator’s Overview</a><ul>
+<li><a class="reference internal" href="#quickstart">Quickstart</a><ul>
+<li><a class="reference internal" href="#the-stack">The “stack”</a></li>
+<li><a class="reference internal" href="#creating-the-brainsimulator-object">Creating the brainSimulator object</a></li>
+<li><a class="reference internal" href="#fitting-the-model">Fitting the model</a></li>
+<li><a class="reference internal" href="#generating-a-new-dataset">Generating a new dataset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to brainSimulator’s documentation!</a></p>
@@ -111,7 +170,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, SiPBA@UGR.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
     </div>
   </body>
 </html>

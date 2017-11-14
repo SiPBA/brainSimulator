@@ -1,7 +1,7 @@
 This is makeindex, version 2.15 [TeX Live 2017] (kpathsea + Thai support).
 Scanning style file ./python.ist.......done (7 attributes redefined, 0 ignored).
-Scanning input file brainSimulator.idx....done (8 entries accepted, 0 rejected).
-Sorting entries....done (27 comparisons).
-Generating output file brainSimulator.ind....done (25 lines written, 0 warnings).
+Scanning input file brainSimulator.idx....done (18 entries accepted, 0 rejected).
+Sorting entries....done (75 comparisons).
+Generating output file brainSimulator.ind....done (48 lines written, 0 warnings).
 Output written in brainSimulator.ind.
 Transcript written in brainSimulator.ilg.

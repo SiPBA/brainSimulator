@@ -1,8 +1,18 @@
-\indexentry{brainSimulator (module)|hyperpage}{1}
-\indexentry{brainSimulator (module)|hyperpage}{1}
-\indexentry{KDEestimator (class in brainSimulator)|hyperpage}{1}
-\indexentry{botev\_bandwidth() (brainSimulator.KDEestimator method)|hyperpage}{1}
-\indexentry{finite() (brainSimulator.KDEestimator method)|hyperpage}{1}
-\indexentry{BrainSimulator (class in brainSimulator)|hyperpage}{1}
-\indexentry{createNewBrains() (brainSimulator.BrainSimulator method)|hyperpage}{1}
-\indexentry{generateDataset() (brainSimulator.BrainSimulator method)|hyperpage}{1}
+\indexentry{brainSimulator (module)|hyperpage}{5}
+\indexentry{brainSimulator (module)|hyperpage}{5}
+\indexentry{brainSimulator (module)|hyperpage}{9}
+\indexentry{brainSimulator (module)|hyperpage}{9}
+\indexentry{BrainSimulator (class in brainSimulator)|hyperpage}{9}
+\indexentry{createNewBrains() (brainSimulator.BrainSimulator method)|hyperpage}{9}
+\indexentry{decompose() (brainSimulator.BrainSimulator method)|hyperpage}{9}
+\indexentry{estimateDensity() (brainSimulator.BrainSimulator method)|hyperpage}{10}
+\indexentry{fit() (brainSimulator.BrainSimulator method)|hyperpage}{10}
+\indexentry{generateDataset() (brainSimulator.BrainSimulator method)|hyperpage}{10}
+\indexentry{model() (brainSimulator.BrainSimulator method)|hyperpage}{10}
+\indexentry{sample() (brainSimulator.BrainSimulator method)|hyperpage}{10}
+\indexentry{MVNormalEstimator (class in brainSimulator)|hyperpage}{11}
+\indexentry{GaussianEstimator (class in brainSimulator)|hyperpage}{11}
+\indexentry{KDEestimator (class in brainSimulator)|hyperpage}{11}
+\indexentry{botev\_bandwidth() (brainSimulator.KDEestimator method)|hyperpage}{11}
+\indexentry{applyPCA() (in module brainSimulator)|hyperpage}{11}
+\indexentry{applyICA() (in module brainSimulator)|hyperpage}{12}

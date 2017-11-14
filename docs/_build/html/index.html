@@ -54,10 +54,24 @@
 <p><cite>brainSimulator</cite> is a brain image synthesis procedure intended to generate a new image set that share characteristics with an original one. The system focuses on nuclear imaging modalities such as PET or SPECT brain images. It analyses the dataset by applying PCA to the original dataset, and then model the distribution of samples in the projected eigenbrain space using a Probability Density Function (PDF) estimator. Once the model has been built, anyone can generate new coordinates on the eigenbrain space belonging to the same class, which can be then projected back to the image space.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">BrainSimulator’s Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">BrainSimulator’s Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#quickstart">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#the-stack">The “stack”</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#creating-the-brainsimulator-object">Creating the brainSimulator object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#fitting-the-model">Fitting the model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#generating-a-new-dataset">Generating a new dataset</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="training.html">Training brainSimulator’s objects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="synthesizing.html">Synthesizing new brain images</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">brainSimulator’s API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">brainSimulator’s API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#class-brainsimulator">class brainSimulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#auxiliary-classes">auxiliary classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#auxiliary-functions">auxiliary functions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 </ul>
 </div>
@@ -124,7 +138,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, SiPBA@UGR.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
     </div>
   </body>
 </html>
