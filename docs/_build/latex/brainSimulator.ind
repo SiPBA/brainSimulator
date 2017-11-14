@@ -1,0 +1,25 @@
+\begin{sphinxtheindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter B
+  \item botev\_bandwidth() (brainSimulator.KDEestimator method), \hyperpage{1}
+  \item BrainSimulator (class in brainSimulator), \hyperpage{1}
+  \item brainSimulator (module), \hyperpage{1}
+
+  \indexspace
+  \bigletter C
+  \item createNewBrains() (brainSimulator.BrainSimulator method), \hyperpage{1}
+
+  \indexspace
+  \bigletter F
+  \item finite() (brainSimulator.KDEestimator method), \hyperpage{1}
+
+  \indexspace
+  \bigletter G
+  \item generateDataset() (brainSimulator.BrainSimulator method), \hyperpage{1}
+
+  \indexspace
+  \bigletter K
+  \item KDEestimator (class in brainSimulator), \hyperpage{1}
+
+\end{sphinxtheindex}
