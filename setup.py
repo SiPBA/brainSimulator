@@ -14,6 +14,8 @@ setup(
 		  "scikit-learn",
 		  "scipy",
     ],
+    download_url='https://github.com/SiPBA/brainSimulator/archive/0.5.1.tar.gz',
+    keywords=['brain', 'image', 'synthesis', 'PCA', 'neuroimaging', 'ICA'],
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha

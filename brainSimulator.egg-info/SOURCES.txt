@@ -1,0 +1,9 @@
+README.md
+brainSimulator.py
+setup.cfg
+setup.py
+brainSimulator.egg-info/PKG-INFO
+brainSimulator.egg-info/SOURCES.txt
+brainSimulator.egg-info/dependency_links.txt
+brainSimulator.egg-info/requires.txt
+brainSimulator.egg-info/top_level.txt
