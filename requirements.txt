@@ -1,0 +1,3 @@
+Numpy>=1.9
+Scikit-learn>=0.17
+Scipy>=0.17
