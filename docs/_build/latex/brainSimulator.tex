@@ -54,7 +54,7 @@
 
 
 \title{brainSimulator Documentation}
-\date{Nov 14, 2017}
+\date{Nov 15, 2017}
 \release{0.5.1}
 \author{SiPBA@UGR}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -74,7 +74,7 @@ Functional brain image synthesis using the KDE or MVN distribution. Currently in
 
 
 \chapter{BrainSimulator’s Overview}
-\label{\detokenize{overview:welcome-to-brainsimulator-s-documentation}}\label{\detokenize{overview::doc}}\label{\detokenize{overview:brainsimulator-s-overview}}
+\label{\detokenize{overview:brainsimulator-s-overview}}\label{\detokenize{overview:welcome-to-brainsimulator-s-documentation}}\label{\detokenize{overview::doc}}
 \sphinxtitleref{brainSimulator} is a brain image synthesis procedure intended to generate a new image set that share characteristics with an original one. The system focuses on nuclear imaging modalities such as PET or SPECT brain images. It analyses the dataset by applying PCA to the original dataset, and then model the distribution of samples in the projected eigenbrain space using a Probability Density Function (PDF) estimator. Once the model has been built, anyone can generate new coordinates on the eigenbrain space belonging to the same class, which can be then projected back to the image space.
 
 \begin{figure}[htbp]
@@ -144,32 +144,6 @@ Once the fitting procedure has finalised, you can generate a new dataset using t
 
 This will generate 200 new samples for each class in 0, 1 and 2, ready to use in our favourite machine learning algorithm.
 
-
-\chapter{Training brainSimulator’s objects}
-\label{\detokenize{training:module-brainSimulator}}\label{\detokenize{training:training-brainsimulator-s-objects}}\label{\detokenize{training::doc}}\index{brainSimulator (module)}\phantomsection\label{\detokenize{training:module-brainSimulator}}\index{brainSimulator (module)}
-Created on Thu Apr 28 15:53:15 2016
-Last update: 9 Aug, 2017
-
-@author: Francisco J. Martinez-Murcia \textless{}\sphinxhref{mailto:fjesusmartinez@ugr.es}{fjesusmartinez@ugr.es}\textgreater{}
-
-Copyright (C) 2017 Francisco Jesús Martínez Murcia and SiPBA Research Group
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see \textless{}\sphinxurl{http://www.gnu.org/licenses/}\textgreater{}.
-
-
-\chapter{Synthesizing new brain images}
-\label{\detokenize{synthesizing:synthesizing-new-brain-images}}\label{\detokenize{synthesizing::doc}}
 
 \chapter{brainSimulator’s API}
 \label{\detokenize{api:brainsimulator-s-api}}\label{\detokenize{api:module-brainSimulator}}\label{\detokenize{api::doc}}\index{brainSimulator (module)}\phantomsection\label{\detokenize{api:module-brainSimulator}}\index{brainSimulator (module)}
@@ -545,7 +519,7 @@ This function applies ICA decomposition to a matrix containing all subjects to b
 
 
 \chapter{License}
-\label{\detokenize{license::doc}}\label{\detokenize{license:license}}\begin{quote}
+\label{\detokenize{license:license}}\label{\detokenize{license::doc}}\begin{quote}
 \begin{quote}
 \begin{description}
 \item[{GNU GENERAL PUBLIC LICENSE}] \leavevmode
@@ -1561,12 +1535,6 @@ F.J. Martinez-Murcia et al (2017). “Functional Brain Imaging Synthesis Based o
 \end{itemize}
 
 
-\renewcommand{\indexname}{Python Module Index}
-\begin{sphinxtheindex}
-\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
-\bigletter{b}
-\item {\sphinxstyleindexentry{brainSimulator}}\sphinxstyleindexextra{Unix, Windows}\sphinxstyleindexpageref{training:\detokenize{module-brainSimulator}}
-\end{sphinxtheindex}
 
 \renewcommand{\indexname}{Index}
 \printindex

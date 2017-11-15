@@ -2,47 +2,47 @@
 \def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
 
   \bigletter A
-  \item applyICA() (in module brainSimulator), \hyperpage{12}
-  \item applyPCA() (in module brainSimulator), \hyperpage{11}
+  \item applyICA() (in module brainSimulator), \hyperpage{8}
+  \item applyPCA() (in module brainSimulator), \hyperpage{7}
 
   \indexspace
   \bigletter B
-  \item botev\_bandwidth() (brainSimulator.KDEestimator method), \hyperpage{11}
-  \item BrainSimulator (class in brainSimulator), \hyperpage{9}
-  \item brainSimulator (module), \hyperpage{5}, \hyperpage{9}
+  \item botev\_bandwidth() (brainSimulator.KDEestimator method), \hyperpage{7}
+  \item BrainSimulator (class in brainSimulator), \hyperpage{5}
+  \item brainSimulator (module), \hyperpage{5}
 
   \indexspace
   \bigletter C
-  \item createNewBrains() (brainSimulator.BrainSimulator method), \hyperpage{9}
+  \item createNewBrains() (brainSimulator.BrainSimulator method), \hyperpage{5}
 
   \indexspace
   \bigletter D
-  \item decompose() (brainSimulator.BrainSimulator method), \hyperpage{9}
+  \item decompose() (brainSimulator.BrainSimulator method), \hyperpage{5}
 
   \indexspace
   \bigletter E
-  \item estimateDensity() (brainSimulator.BrainSimulator method), \hyperpage{10}
+  \item estimateDensity() (brainSimulator.BrainSimulator method), \hyperpage{6}
 
   \indexspace
   \bigletter F
-  \item fit() (brainSimulator.BrainSimulator method), \hyperpage{10}
+  \item fit() (brainSimulator.BrainSimulator method), \hyperpage{6}
 
   \indexspace
   \bigletter G
-  \item GaussianEstimator (class in brainSimulator), \hyperpage{11}
-  \item generateDataset() (brainSimulator.BrainSimulator method), \hyperpage{10}
+  \item GaussianEstimator (class in brainSimulator), \hyperpage{7}
+  \item generateDataset() (brainSimulator.BrainSimulator method), \hyperpage{6}
 
   \indexspace
   \bigletter K
-  \item KDEestimator (class in brainSimulator), \hyperpage{11}
+  \item KDEestimator (class in brainSimulator), \hyperpage{7}
 
   \indexspace
   \bigletter M
-  \item model() (brainSimulator.BrainSimulator method), \hyperpage{10}
-  \item MVNormalEstimator (class in brainSimulator), \hyperpage{11}
+  \item model() (brainSimulator.BrainSimulator method), \hyperpage{6}
+  \item MVNormalEstimator (class in brainSimulator), \hyperpage{7}
 
   \indexspace
   \bigletter S
-  \item sample() (brainSimulator.BrainSimulator method), \hyperpage{10}
+  \item sample() (brainSimulator.BrainSimulator method), \hyperpage{6}
 
 \end{sphinxtheindex}

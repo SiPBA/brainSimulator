@@ -297,10 +297,10 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/times/ptmr8c.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/courier/pcrro8t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/courier/pcrro8r.tfm
+INPUT brainSimulator.ind
+INPUT brainSimulator.ind
 INPUT /usr/share/texlive/texmf-dist/fonts/vf/adobe/helvetic/phvr8t.vf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/helvetic/phvr8r.tfm
-INPUT brainSimulator.ind
-INPUT brainSimulator.ind
 INPUT brainSimulator.aux
 INPUT ./brainSimulator.out
 INPUT ./brainSimulator.out

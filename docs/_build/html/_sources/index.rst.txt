@@ -11,11 +11,10 @@ Functional brain image synthesis using the KDE or MVN distribution. Currently in
 
 .. toctree::
    overview
-   training
-   synthesizing
    api
    license
-
+..   training
+..   synthesizing
 
 Cite
 ----------------
