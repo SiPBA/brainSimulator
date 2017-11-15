@@ -5,9 +5,8 @@ setup(
     version="0.5",
     install_requires=[
         "numpy",
-        "numbers",
-		"sklearn",
-		"scipy",
+		  "sklearn",
+		  "scipy",
     ],
     # ...
 )
