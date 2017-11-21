@@ -7,6 +7,17 @@ BrainSimulator's Overview
    :align: center
    :alt: Schema of the synthesis methodology.
 
+Installation
+-------------------
+`brainSimulator` is now available via `pypi` and can be installed directly from::
+
+	pip install brainSimulator
+
+Alternatively, download the package, uncompress and execute::
+
+	cd /path/to/uncompressed/brainSimulator/
+	python setup.py install
+
 Quickstart
 -------------------
 The "stack"
